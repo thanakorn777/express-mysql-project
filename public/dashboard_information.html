@@ -1,0 +1,106 @@
+<!-- public/dashboard.html -->
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>หน้าข้อมูล - Mission Hospital</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <style>
+    .header-logo {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #f0f0f0;
+      padding: 1rem;
+    }
+
+    .action-buttons button {
+      margin-right: 0.5rem;
+    }
+
+    .table-actions button {
+      border: none;
+      background: none;
+      margin: 0 3px;
+    }
+
+    .table-actions i {
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body class="bg-light">
+
+<div class="container d-flex flex-column align-items-center py-4">
+  <!-- Header -->
+  <div class="w-100 mb-3">
+    <div class="header-logo rounded shadow-sm">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Adventist_logo.svg/1200px-Adventist_logo.svg.png" height="50">
+      <h4 class="mb-0">โรงพยาบาลมิชชั่น Mission Hospital</h4>
+      <div class="d-flex gap-2">
+        <a href="dashboard_information.html" class="btn btn-success">หน้าข้อมูล</a>
+        <a href="add_information.html" class="btn btn-primary">เพิ่มข้อมูล</a>
+        <a href="dashboard_report.html" class="btn btn-secondary position-relative">รับแจ้งปัญหา</a>
+        <a href="report_issue.html" class="btn btn-warning">แจ้งปัญหา</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="w-100 d-flex justify-content-between align-items-center mb-2 px-3">
+    <div>จำนวนทั้งหมด 0 รายการ</div>
+    <div>
+      <input type="text" class="form-control" placeholder="ค้นหา..." id="searchInput" style="max-width: 300px;">
+    </div>
+  </div>
+
+  <!-- Table -->
+<div class="table-responsive w-100">
+  <table class="table table-bordered align-middle w-100">
+    <thead class="table-secondary text-center">
+      <tr>
+        <th scope="col">Floor</th>
+        <th scope="col">Department</th>
+        <th scope="col">IP Address</th>
+        <th scope="col">Device</th>
+        <th scope="col">Tel</th>
+        <th scope="col">Note</th>
+        <th scope="col">CreateDate</th>
+        <th scope="col">การจัดการ</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="text-center">1</td>
+        <td>Medicine</td>
+        <td>19x.xxx.xxx</td>
+        <td>Computer</td>
+        <td>08x-xxx-xxxx</td>
+        <td>Note xxxxxxxxxxx</td>
+        <td>09:13 น. 18/03/2568</td>
+        <td class="text-end">
+          <div class="dropstart">
+            <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-gear-fill"></i>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item text-warning" href="#">📝 แก้ไข</a></li>
+              <li><a class="dropdown-item text-danger" href="#">🗑 ลบ</a></li>
+            </ul>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Bootstrap Icons (เฉพาะไอคอน) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<!-- Bootstrap JavaScript (สำหรับ dropdown, modal, etc.) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
