@@ -42,8 +42,8 @@
     <h4 class="text-center mb-4 fw-bold">แจ้งปัญหา</h4>
     <form action="/report_issue" method="POST">
       <div class="mb-3">
-        <label for="floor" class="form-label">Name</label>
-        <input type="text" class="form-control" id="Name" name="Name" required>
+        <label for="name" class="form-label">Name</label>
+        <input type="text" class="form-control" id="name" name="name" required>
       </div>
       <div class="mb-3">
         <label for="department" class="form-label">Dept</label>
@@ -64,6 +64,15 @@
       <div class="mb-3">
         <label for="note" class="form-label">Note</label>
         <input type="text" class="form-control" id="note" name="note" rows="4">
+      </div>
+      <div class="mb-3">
+        <label for="status" class="form-label">Status</label>
+        <select class="form-select" id="status" name="status" required>
+          <option value="" disabled selected>-- เลือกระดับความเร่งด่วน --</option>
+          <option value="urgent">🔴 แดง (เร่งด่วน)</option>
+          <option value="normal">🟡 เหลือง (ปกติ)</option>
+          <option value="not_urgent">🟢 เขียว (ไม่เร่งด่วน)</option>
+        </select>
       </div>
       <div class="d-flex justify-content-between">
         <button type="button" class="btn btn-cancel w-50 me-2" onclick="history.back()">กลับ</button>

@@ -51,6 +51,7 @@
   <!-- Search -->
   <div class="w-100 d-flex justify-content-between align-items-center mb-2 px-3">
     <div>จำนวนทั้งหมด <span id="totalCount">0</span> รายการ</div>
+    <h5 class="text-center mb-3">หน้าข้อมูล</h5>
     <div>
       <input type="text" class="form-control" placeholder="ค้นหา..." id="searchInput" style="max-width: 300px;">
     </div>
@@ -90,6 +91,18 @@
   </div>
 </div>
 
+<!-- Toast แจ้งเตือน -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+  <div id="deleteToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        ✅ ลบข้อมูลเรียบร้อยแล้ว
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal แก้ไข -->
 <div class="modal fade" id="editModal" tabindex="-1">
   <div class="modal-dialog">
@@ -109,7 +122,7 @@
           <div class="mb-2"><textarea class="form-control" id="edit-note" placeholder="Note"></textarea></div>
         </div>
         <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">บันทึก</button>
+          <button type="submit" class="btn btn-primary" >บันทึก</button>
         </div>
       </form>
     </div>
@@ -171,6 +184,10 @@
           if (res.ok) {
             fetchTableData();
             fetchTotalCount();
+            const toastEl = document.getElementById('deleteToast');
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+
           } else {
             alert('เกิดข้อผิดพลาดในการลบข้อมูล');
           }
@@ -207,7 +224,7 @@
           tel: document.getElementById('edit-tel').value,
           note: document.getElementById('edit-note').value,
         };
-  
+          
         fetch(`/dashboard_information/${id}`, {
           method: 'PUT',
           headers: {
@@ -216,7 +233,7 @@
           body: JSON.stringify(data),
         }).then(res => {
           console.log("✅ Response จาก fetch:", res);
-  
+          
           if (res.ok) {
             if (currentEditModal) currentEditModal.hide();
   

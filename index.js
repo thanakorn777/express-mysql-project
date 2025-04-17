@@ -5,6 +5,7 @@ const path = require('path');
 const db = require('./db');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
+const { error } = require('console');
 
 const app = express();
 const port = 3000;
@@ -159,20 +160,22 @@ app.post('/dashboard_information', async (req, res) => {
 });
 
 // ✅ ลบข้อมูล
-app.delete('/dashboard_information/:id', (req, res) => {
+app.delete('/dashboard_information/:id', async (req, res) => {
   const id = req.params.id;
   const sql = 'DELETE FROM dashboard_information WHERE id = ?';
-  db.query(sql, [id], (err, result) => {
-    if (err) {
-      console.error('Error deleting data:', err);
-      return res.status(500).send('Error deleting data');
-    }
+
+  try {
+    const [result] = await db.query(sql, [id]);
+    console.log('✅ Deleted ID:', id);
     res.status(200).send('Deleted');
-  });
+  } catch (err) {
+    console.error('❌ Error deleting data:', err);
+    res.status(500).send('Error deleting data');
+  }
 });
 
 // ✅ อัปเดตข้อมูล
-app.put('/dashboard_information/:id', (req, res) => {
+app.put('/dashboard_information/:id', async (req, res) => {
   const id = req.params.id;
   const { floor, department, ip_address, device, tel, note } = req.body;
 
@@ -185,13 +188,56 @@ app.put('/dashboard_information/:id', (req, res) => {
   `;
   const values = [floor, department, ip_address, device, tel, note, id];
 
-  db.query(sql, values, (err, result) => {
-    if (err) {
-      console.error('Error updating data:', err);
-      return res.status(500).send('Error updating data');
-    }
+  try {
+    const [result] = await db.query(sql, values); // ใช้ async/await
+    console.log('🔄 Update result:', result);
     res.status(200).send('Updated');
-  });
+  } catch (err) {
+    console.error('🔥 Error updating data:', err);
+    res.status(500).send('Error updating data');
+  }
+});
+
+// ✅ API Endpoint /report_issue
+app.post('/report_issue', async (req, res) => {
+  const { name, department, ip_address, tel, note, status } = req.body;
+
+  try {
+    await db.query(
+      'INSERT INTO dashboard_report (name, department, ip_address, tel, note, status) VALUES (?, ?, ?, ?, ?, ?)',
+      [name, department, ip_address, tel, note, status]
+    );
+    res.redirect('/dashboard_report.html');
+  } catch (err) {
+    console.error('❌ Error saving report issue:', err);
+    res.status(500).send('Error saving report');
+  }
+});
+
+// ✅ API สำหรับดึงข้อมูลไปแสดงใน dashboard_report.html
+app.get('/api/dashboard_report', async (req, res) => {
+  try {
+    const [rows] = await db.query('SELECT * FROM dashboard_report ORDER BY created_at DESC');
+    res.json(rows);
+  } catch (err) {
+    console.error('❌ Error fetching dashboard report:', err);
+    res.status(500).send('Error fetching report');
+  }
+});
+
+// ✅ ลบข้อมูลจาก dashboard_report
+app.delete('/dashboard_report/:id', async (req, res) => {
+  const id = req.params.id;
+  const sql = 'DELETE FROM dashboard_report WHERE id = ?';
+
+  try {
+    const [result] = await db.query(sql, [id]);
+    console.log('✅ Deleted ID:', id);
+    res.status(200).send('Deleted');
+  } catch (err) {
+    console.error('❌ Error deleting report:', err);
+    res.status(500).send('Error deleting report');
+  }
 });
 
 // ✅ Start server
