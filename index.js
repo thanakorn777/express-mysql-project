@@ -47,47 +47,68 @@ function requireLogin(req, res, next) {
   next();
 }
 
+// ✅ Middleware ป้องกันสิทธิ์ตาม role
+function requireRole(role) {
+  return function (req, res, next) {
+    if (!req.session.user || req.session.user.role !== role) {
+      return res.status(403).send('🚫 Access denied');
+    }
+    next();
+  };
+}
+
+// ✅ หน้า dashboard สำหรับ admin เท่านั้น
+app.get('/dashboard_information.html', requireLogin, requireRole('admin'), (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'dashboard_information.html'));
+});
+
+app.get('/dashboard_report.html', requireLogin, requireRole('admin'), (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'dashboard_report.html'));
+});
+
+// ✅ หน้า report_issue สำหรับ user เท่านั้น
+app.get('/user_main.html', requireLogin, requireRole('user'), (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'user_main.html'));
+});
+
 // ✅ หน้า login เป็นหน้าแรก
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
-});
-
-// ✅ หน้า dashboard ต้อง login ก่อนเข้า
-app.get('/dashboard_information.html', requireLogin, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'dashboard_information.html'));
 });
 
 // ✅ Login (ปรับปรุงเวอร์ชันทำงานแน่นอน)
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
-  console.log('📥 ฟอร์มที่ได้รับ:');
-  console.log('email:', `"${email}"`);
-  console.log('password:', `"${password}"`);
-
   try {
     const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
 
     if (rows.length === 0) {
-      console.log('❌ ไม่พบ email ในฐานข้อมูล');
       return res.status(401).send('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
     }
 
     const user = rows[0];
-    console.log('🔐 Hash ในฐานข้อมูล:', user.password);
 
     const match = await bcrypt.compare(password.trim(), user.password);
-    console.log('🧪 bcrypt.compare:', match);
 
     if (!match) {
-      console.log('❌ password ไม่ตรง');
       return res.status(401).send('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
     }
 
-    // ✅ Login สำเร็จ
-    req.session.user = { id: user.id, email: user.email };
-    console.log('✅ เข้าสู่ระบบสำเร็จ');
-    res.redirect('/dashboard_information.html');
+    // ✅ เพิ่ม role เข้า session
+    req.session.user = {
+      id: user.id,
+      email: user.email,
+      role: user.role  // <<==== ใส่ตรงนี้
+    };
+
+    // 👉 เปลี่ยนเส้นทางตาม role
+    if (user.role === 'admin') {
+      res.redirect('/dashboard_information.html');
+    } else {
+      res.redirect('user_main.html');
+    }
+
   } catch (err) {
     console.error('🔥 login error:', err);
     res.status(500).send('เกิดข้อผิดพลาดในระบบ');
@@ -114,7 +135,7 @@ app.post('/user', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     await db.query(
       'INSERT INTO users (email, password) VALUES (?, ?)',
-      [username, email, hashedPassword]
+      [email, hashedPassword]
     );
     res.status(201).send('User created');
   } catch (err) {
@@ -201,18 +222,30 @@ app.put('/dashboard_information/:id', async (req, res) => {
 // ✅ API Endpoint /report_issue
 app.post('/report_issue', async (req, res) => {
   const { name, department, ip_address, tel, note, status } = req.body;
-
-  try {
-    await db.query(
-      'INSERT INTO dashboard_report (name, department, ip_address, tel, note, status) VALUES (?, ?, ?, ?, ?, ?)',
-      [name, department, ip_address, tel, note, status]
-    );
-    res.redirect('/dashboard_report.html');
-  } catch (err) {
-    console.error('❌ Error saving report issue:', err);
-    res.status(500).send('Error saving report');
-  }
-});
+  
+  // 🐞 debug ตรงนี้เลย
+  console.log('👉 Session user role:', req.session.user?.role);
+  
+    try {
+      await db.query(
+        'INSERT INTO dashboard_report (name, department, ip_address, tel, note, status) VALUES (?, ?, ?, ?, ?, ?)',
+        [name, department, ip_address, tel, note, status]
+      );
+  
+      // ✅ redirect ตาม role ของผู้ใช้
+      const userRole = req.session.user?.role;
+  
+      if (userRole === 'admin') {
+        res.redirect('/dashboard_report.html');
+      } else {
+        res.redirect('/user_main.html');
+      }
+  
+    } catch (err) {
+      console.error('❌ Error saving report issue:', err);
+      res.status(500).send('Error saving report');
+    }
+  });
 
 // ✅ API สำหรับดึงข้อมูลไปแสดงใน dashboard_report.html
 app.get('/api/dashboard_report', async (req, res) => {
