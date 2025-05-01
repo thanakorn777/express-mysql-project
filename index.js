@@ -3,7 +3,7 @@ const express = require('express');
 const mysql = require('mysql2');
 const path = require('path');
 const db = require('./db');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const session = require('express-session');
 const { error } = require('console');
 
