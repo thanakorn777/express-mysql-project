@@ -8,7 +8,7 @@ const session = require('express-session');
 const { error } = require('console');
 
 const app = express();
-const port = 3306;
+const port = 3000;
 
 // Middleware
 app.use(express.json());
