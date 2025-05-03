@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 
 // hash ที่ต้องการตรวจสอบ
-const hash = '$2b$10$jV1ncempBojJdPUOqEMBkeaO1wrtS14pL6KqTq0DZrhbKv/97FSoO';
+const hash = '$2b$10$51/V2ojZAgmB3LI.g4ICwO2PCoBhFXK5s5gRYPHepcYwRMEX9e.Hq';
 
 // password ที่จะเทียบ
 const passwordToTest = '654321';
